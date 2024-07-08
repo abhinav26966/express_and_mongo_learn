@@ -2,12 +2,11 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const mongoose = require("mongoose");
+const dotenv = require("dotenv").config();
 app.use(express.json());
 
 mongoose
-  .connect(
-    "mongodb+srv://abhinavnagar2696:Abhi2604@cluster0.esiq0z8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-  )
+  .connect(process.env.MONGO_URL)
   .then(() => {
     console.log("Connected to MongoDB");
   })
@@ -47,6 +46,25 @@ app.post("/api/products", async (req, res) => {
   console.log(product);
 
   return res.status(200).json({ message: "Product created successfully" });
+});
+app.get("/api/products", async (req, res) => {
+  const products = await productModel.find();
+  return res.status(200).json(products);
+})
+
+app.get("/api/products/:id", async (req, res) => {
+  const product = await productModel.findById(req.params.id);
+  return res.status(200).json(product);
+});
+
+app.put("/api/products/:id", async (req, res) => {
+  const product = await productModel.findByIdAndUpdate(req.params.id, req.body);
+  return res.status(200).json(product);
+});
+
+app.delete("/api/products/:id", async (req, res) => {
+  const product = await productModel.findByIdAndDelete(req.params.id);
+  return res.status(200).json(product);
 });
 
 app.get("/", (req, res) => {
